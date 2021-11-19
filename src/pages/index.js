@@ -1,8 +1,88 @@
-import { Box, Flex, Heading, Link, SimpleGrid, Text } from '@chakra-ui/layout'
+import { useEffect, useState } from 'react'
+
+import { Box, Button, Flex, Heading, Text, useToast } from '@chakra-ui/react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 
 export default function Home() {
+  const [walletAddress, setWalletAddress] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const checkIfWalletIsConnected = async () => {
+    try {
+      const { solana } = window
+
+      if (solana && solana.isPhantom) {
+        console.log('Phantom wallet is found!')
+
+        const response = await solana.connect({ onlyIfTrusted: true })
+        console.log('Connected with Public Key:', response.publicKey.toString())
+        setWalletAddress(response.publicKey.toString())
+      } else {
+        setErrorMessage(true)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const connectWallet = async () => {
+    const { solana } = window
+
+    if (solana) {
+      const response = await solana.connect()
+      console.log('Connected with Public Key:', response.publicKey.toString())
+      setWalletAddress(response.publicKey.toString())
+      toast({
+        title: 'Great!',
+        description: 'Your Phantom wallet is now connected.',
+        status: 'success',
+        duration: 5000,
+        position: 'top-right',
+        isClosable: true,
+      })
+    }
+  }
+
+  const toast = useToast()
+
+  const renderNotConnectedContainer = () => {
+    const id = 'test-toast'
+
+    return (
+      <Button
+        colorScheme="blue"
+        size="lg"
+        onClick={() => {
+          if (errorMessage && !toast.isActive(id)) {
+            toast({
+              id,
+              title: 'Oops! Phantom Wallet not found.',
+              description: 'Switch to a compatible browser.',
+              status: 'warning',
+              duration: 5000,
+              position: 'top-right',
+              isClosable: true,
+            })
+          } else connectWallet()
+        }}
+      >
+        Connect to Wallet
+      </Button>
+    )
+  }
+
+  useEffect(() => {
+    const onLoad = async () => {
+      setIsLoading(true)
+      await checkIfWalletIsConnected()
+      setIsLoading(false)
+    }
+    onLoad()
+    return () => onLoad()
+  }, [])
+
   return (
     <Box>
       {/* Edit the Head info */}
@@ -17,49 +97,9 @@ export default function Home() {
         py="12"
         px="6"
       >
-        <Heading as="h1">Next Chakra UI Starter</Heading>
-
-        <Text mb="12">
-          Get started by editing <code>pages/index.js</code>
-        </Text>
-
-        <SimpleGrid columns={[1, 2]} spacing={12} maxW="600px">
-          <Link href="https://nextjs.org/docs">
-            <Heading as="h3" fontSize="lg">
-              Documentation &rarr;
-            </Heading>
-            <Text>
-              Find in-depth information about Next.js features and API.
-            </Text>
-          </Link>
-
-          <Link href="https://nextjs.org/learn">
-            <Heading as="h3" fontSize="lg">
-              Learn &rarr;
-            </Heading>
-            <Text>
-              Learn about Next.js in an interactive course with quizzes!
-            </Text>
-          </Link>
-
-          <Link href="https://github.com/vercel/next.js/tree/master/examples">
-            <Heading as="h3" fontSize="lg">
-              Examples &rarr;
-            </Heading>
-            <Text>
-              Discover and deploy boilerplate example Next.js projects.
-            </Text>
-          </Link>
-
-          <Link href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app">
-            <Heading as="h3" fontSize="lg">
-              Deploy &rarr;
-            </Heading>
-            <Text>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </Text>
-          </Link>
-        </SimpleGrid>
+        <Heading as="h1">B-Boys GIFs Portal</Heading>
+        <Text mb="4">View your B-boys Gifs collection in the metaverse ✨</Text>
+        {!walletAddress && !isLoading && renderNotConnectedContainer()}
       </Flex>
 
       <Box role="contentinfo">
