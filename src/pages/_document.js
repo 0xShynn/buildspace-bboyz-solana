@@ -4,12 +4,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head>
-          {/* <link
-            rel="stylesheet"
-            href="https://unpkg.com/react-gif-player@0.4.2/dist/gifplayer.css"
-          /> */}
-        </Head>
+        <Head></Head>
         <body>
           <Main />
           <NextScript />

@@ -174,26 +174,56 @@ export default function Home() {
           <Box
             key={index}
             rounded="2xl"
-            m="4"
             overflow="hidden"
             border="4px"
+            borderColor="red.800"
+            display="inline-flex"
+            maxH="300px"
+            maxW="300px"
             _hover={{ border: '4px', borderColor: 'red' }}
-            objectFit="cover"
             sx={{
               '.gif_player': {
                 display: 'inline-block',
                 pos: 'relative',
+                userSelect: 'none',
+                cursor: 'pointer',
                 '.play_button': {
-                  bgColor: 'red',
+                  pos: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  padding: '14px 12px',
+                  bgColor: 'rgba(0, 0, 0, 0.5)',
+                  border: '2px dashed #fff',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 0 3px rgba(0, 0, 0, 0.5)',
+                  color: '#FFF',
+                  fontsize: '24px',
+                  fontFamily: 'heading',
+                  opacity: '1',
+                  transform: 'translate(-50%, -50%) scale(1) rotate(0deg)',
+                  transition: 'transform 0.4s, opacity 0.4s;}',
+                },
+                '.play_button:hover': {
+                  bgColor: 'rgba(0,0,0,0.7)',
+                },
+                '.play_button::after': {
+                  content: `'GIF'`,
+                },
+                '.playing .play_button': {
+                  transform: 'translate(-50%, -50%) scale(0) rotate(180deg)',
+                  opacity: '0.5',
+                },
+                '.gif_player img': {
+                  w: '300px',
+                  h: '100%',
+                  objectFit: 'cover',
                 },
               },
             }}
           >
             <GifPlayer
               gif={gif}
-              onTogglePlay={() => {
-                console.log('hello')
-              }}
+              onTogglePlay={() => {}}
               width="300px"
               height="300px"
             />
@@ -231,22 +261,24 @@ export default function Home() {
         <Box mb="4">
           <Image src={Logo} alt="Logo" />
         </Box>
-        <Box
-          rounded="2xl"
-          m="4"
-          overflow="hidden"
-          border="4px"
-          _hover={{ border: '4px', borderColor: 'red' }}
-        >
-          <GifPlayer
-            gif="https://media.giphy.com/media/ubd3YFbbktwGUJtXey/giphy.gif"
-            onTogglePlay={() => {
-              console.log('hello')
-            }}
-            width="300px"
-            height="300px"
-          />
-        </Box>
+        {!walletAddress && (
+          <Box
+            rounded="2xl"
+            m="4"
+            overflow="hidden"
+            border="4px"
+            _hover={{ border: '4px', borderColor: 'red' }}
+          >
+            <GifPlayer
+              gif="https://media.giphy.com/media/ubd3YFbbktwGUJtXey/giphy.gif"
+              onTogglePlay={() => {
+                console.log('hello')
+              }}
+              width="300px"
+              height="300px"
+            />
+          </Box>
+        )}
         <Heading
           as="h1"
           color="gray.300"
