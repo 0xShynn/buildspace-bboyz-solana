@@ -4,13 +4,13 @@
 const canonicalUrl = ''
 
 // Edit the default title
-const defaultTitle = 'Default title'
-const defaultDescription = 'Default description'
+const defaultTitle = 'B-boys GIFs Portal'
+const defaultDescription = 'A collection of b-boys from the Metaverse'
 
 // Edit the SEO parameters
 export const SEO = {
   defaultTitle: defaultTitle,
-  titleTemplate: `${defaultTitle} | %s`,
+  titleTemplate: `${defaultTitle}`,
   canonical: canonicalUrl,
   additionalLinkTags: [
     {

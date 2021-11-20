@@ -1,13 +1,76 @@
 import { useEffect, useState } from 'react'
 
-import { Box, Button, Flex, Heading, Text, useToast } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Input,
+  SimpleGrid,
+  Text,
+  useToast,
+} from '@chakra-ui/react'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
+import { useForm } from 'react-hook-form'
+import * as yup from 'yup'
+
+const schema = yup
+  .object({
+    gif: yup
+      .string()
+      .url()
+      .matches(
+        /^(https|http):\/\/(media|c).(giphy|tenor).com\//gm,
+        'GIF must come from giphy.com or tenor.com'
+      )
+      .required(),
+  })
+  .required()
+
+import Logo from '../assets/images/bboys-metaverse.svg'
+
+const TEST_GIFS = [
+  'https://media.giphy.com/media/XfQDHy2F72FYk/giphy.gif',
+  'https://media.giphy.com/media/jTBGVjRMxXrMEk7oVn/giphy.gif',
+  'https://media.giphy.com/media/ubd3YFbbktwGUJtXey/giphy.gif',
+  'https://media.giphy.com/media/EeAxi5WdlEDMCbXYtP/giphy.gif',
+  'https://media.giphy.com/media/lvClsfvqyb7S8/giphy.gif',
+  'https://media.giphy.com/media/2ikuOEezP3nwr3SLj5/giphy.gif',
+  'https://media.giphy.com/media/wZQnJI3XT1TutaWz0I/giphy.gif',
+  'https://media.giphy.com/media/2x1Rw9Z9xPMpq/giphy.gif',
+  'https://media.giphy.com/media/w6ovaV3maxsMDLJLd3/giphy.gif',
+  'https://c.tenor.com/7TS0LZMjj0AAAAAd/fendijsw-got7.gif',
+]
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
+  const [gifsList, setGifsList] = useState(TEST_GIFS)
+
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: yupResolver(schema) })
+
+  function onSubmit(values) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        alert(JSON.stringify(values, null, 2))
+        setGifsList((prevState) => {
+          const updatedList = [...prevState]
+          updatedList.push(values.gif)
+          return updatedList
+        })
+        resolve()
+        reset()
+      }, 3000)
+    })
+  }
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -52,7 +115,7 @@ export default function Home() {
 
     return (
       <Button
-        colorScheme="blue"
+        colorScheme="pink"
         size="lg"
         onClick={() => {
           if (errorMessage && !toast.isActive(id)) {
@@ -68,10 +131,63 @@ export default function Home() {
           } else connectWallet()
         }}
       >
-        Connect to Wallet
+        Connect your Wallet
       </Button>
     )
   }
+
+  const renderConnectedContainer = () => (
+    <Box>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Flex maxW="600px" mx="auto" align="center" direction="column">
+          <Input
+            type="text"
+            placeholder="Insert your GIF link"
+            variant="filled"
+            _focus={{ bg: 'white' }}
+            {...register('gif')}
+          />
+          <Text color="red.500" mt="2">
+            {errors.gif?.message}
+          </Text>
+
+          <Button
+            mt={4}
+            colorScheme="teal"
+            isLoading={isSubmitting}
+            type="submit"
+          >
+            Submit
+          </Button>
+        </Flex>
+      </form>
+      <SimpleGrid
+        spacing="10"
+        columns={{ base: 1, md: 2, lg: 3, xl: 4 }}
+        py="10"
+      >
+        {gifsList.map((gif, index) => (
+          <Box
+            overflow="hidden"
+            rounded="lg"
+            key={index}
+            pos="relative"
+            w="300px"
+            h="300px"
+          >
+            <Image
+              src={gif}
+              alt={gif}
+              width="300px"
+              height="300px"
+              layout="responsive"
+              objectFit="cover"
+            />
+          </Box>
+        ))}
+      </SimpleGrid>
+    </Box>
+  )
 
   useEffect(() => {
     const onLoad = async () => {
@@ -80,30 +196,42 @@ export default function Home() {
       setIsLoading(false)
     }
     onLoad()
-    return () => onLoad()
   }, [])
 
   return (
     <Box>
       {/* Edit the Head info */}
-      <NextSeo title="Home" description="Description" />
+      <NextSeo
+        title="Home"
+        description="A collection of b-boys from the Metaverse"
+      />
 
       <Flex
         role="main"
-        bg="white"
         direction="column"
         align="center"
         justify="center"
         py="12"
         px="6"
       >
-        <Heading as="h1">B-Boys GIFs Portal</Heading>
-        <Text mb="4">View your B-boys Gifs collection in the metaverse ✨</Text>
+        <Box mb="4">
+          <Image src={Logo} alt="Logo" />
+        </Box>
+        <Heading
+          as="h1"
+          color="gray.300"
+          fontSize="md"
+          mb="8"
+          fontStyle="italic"
+        >
+          Your collection of B-boyz GIFs straight from the blockchainz
+        </Heading>
         {!walletAddress && !isLoading && renderNotConnectedContainer()}
+        {walletAddress && renderConnectedContainer()}
       </Flex>
 
       <Box role="contentinfo">
-        <Flex justify="center" p="6">
+        <Flex justify="center" p="6" color="white">
           <a
             href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
             target="_blank"
