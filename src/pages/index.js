@@ -15,6 +15,7 @@ import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
+import ReactPlayer from 'react-player'
 import * as yup from 'yup'
 
 import Logo from '../assets/images/bboys-metaverse.svg'
@@ -22,6 +23,7 @@ import Logo from '../assets/images/bboys-metaverse.svg'
 const GifPlayer = dynamic(() => import('react-gif-player'), {
   ssr: false,
 })
+
 const schema = yup
   .object({
     gif: yup
@@ -141,7 +143,20 @@ export default function Home() {
   }
 
   const renderConnectedContainer = () => (
-    <Box>
+    <Flex align="center" direction="column">
+      <Box
+        w="full"
+        maxW="640px"
+        h={{ base: '160px', md: '200px' }}
+        bg="red.100"
+        mb="8"
+      >
+        <ReactPlayer
+          url="https://soundcloud.com/nobunaga/world-bboy-classics-by-nobunaga"
+          width="100%"
+          height="100%"
+        />
+      </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex maxW="600px" mx="auto" align="center" direction="column">
           <Input
@@ -230,7 +245,7 @@ export default function Home() {
           </Box>
         ))}
       </SimpleGrid>
-    </Box>
+    </Flex>
   )
 
   useEffect(() => {
