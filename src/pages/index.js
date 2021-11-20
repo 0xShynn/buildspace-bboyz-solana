@@ -12,10 +12,16 @@ import {
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
+import Logo from '../assets/images/bboys-metaverse.svg'
+
+const GifPlayer = dynamic(() => import('react-gif-player'), {
+  ssr: false,
+})
 const schema = yup
   .object({
     gif: yup
@@ -28,8 +34,6 @@ const schema = yup
       .required(),
   })
   .required()
-
-import Logo from '../assets/images/bboys-metaverse.svg'
 
 const TEST_GIFS = [
   'https://media.giphy.com/media/XfQDHy2F72FYk/giphy.gif',
@@ -168,20 +172,30 @@ export default function Home() {
       >
         {gifsList.map((gif, index) => (
           <Box
-            overflow="hidden"
-            rounded="lg"
             key={index}
-            pos="relative"
-            w="300px"
-            h="300px"
+            rounded="2xl"
+            m="4"
+            overflow="hidden"
+            border="4px"
+            _hover={{ border: '4px', borderColor: 'red' }}
+            objectFit="cover"
+            sx={{
+              '.gif_player': {
+                display: 'inline-block',
+                pos: 'relative',
+                '.play_button': {
+                  bgColor: 'red',
+                },
+              },
+            }}
           >
-            <Image
-              src={gif}
-              alt={gif}
+            <GifPlayer
+              gif={gif}
+              onTogglePlay={() => {
+                console.log('hello')
+              }}
               width="300px"
               height="300px"
-              layout="responsive"
-              objectFit="cover"
             />
           </Box>
         ))}
@@ -216,6 +230,22 @@ export default function Home() {
       >
         <Box mb="4">
           <Image src={Logo} alt="Logo" />
+        </Box>
+        <Box
+          rounded="2xl"
+          m="4"
+          overflow="hidden"
+          border="4px"
+          _hover={{ border: '4px', borderColor: 'red' }}
+        >
+          <GifPlayer
+            gif="https://media.giphy.com/media/ubd3YFbbktwGUJtXey/giphy.gif"
+            onTogglePlay={() => {
+              console.log('hello')
+            }}
+            width="300px"
+            height="300px"
+          />
         </Box>
         <Heading
           as="h1"
