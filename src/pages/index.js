@@ -1,41 +1,17 @@
 import { useEffect, useState } from 'react'
 
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Input,
-  SimpleGrid,
-  Text,
-  useToast,
-} from '@chakra-ui/react'
+import { Box, Button, Flex, useToast } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NextSeo } from 'next-seo'
-import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { useForm } from 'react-hook-form'
-import ReactPlayer from 'react-player'
-import * as yup from 'yup'
 
 import Logo from '../assets/images/bboys-metaverse.svg'
-
-const GifPlayer = dynamic(() => import('react-gif-player'), {
-  ssr: false,
-})
-
-const schema = yup
-  .object({
-    gif: yup
-      .string()
-      .url()
-      .matches(
-        /^(https|http):\/\/(media|c).(giphy|tenor).com\//gm,
-        'GIF must come from giphy.com or tenor.com'
-      )
-      .required(),
-  })
-  .required()
+import Footer from '../components/Footer'
+import GifsContainer from '../components/GifsContainer'
+import Header from '../components/Header'
+import InputGif from '../components/InputGif'
+import MusicPlayer from '../components/MusicPlayer'
+import { inputSchema } from '../utils/inputSchema'
 
 const TEST_GIFS = [
   'https://media.giphy.com/media/XfQDHy2F72FYk/giphy.gif',
@@ -61,7 +37,7 @@ export default function Home() {
     register,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: yupResolver(schema) })
+  } = useForm({ resolver: yupResolver(inputSchema) })
 
   function onSubmit(values) {
     return new Promise((resolve) => {
@@ -144,107 +120,15 @@ export default function Home() {
 
   const renderConnectedContainer = () => (
     <Flex align="center" direction="column">
-      <Box
-        w="full"
-        maxW="640px"
-        h={{ base: '160px', md: '200px' }}
-        bg="red.100"
-        mb="8"
-      >
-        <ReactPlayer
-          url="https://soundcloud.com/nobunaga/world-bboy-classics-by-nobunaga"
-          width="100%"
-          height="100%"
-        />
-      </Box>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Flex maxW="600px" mx="auto" align="center" direction="column">
-          <Input
-            type="text"
-            placeholder="Insert your GIF link"
-            variant="filled"
-            _focus={{ bg: 'white' }}
-            {...register('gif')}
-          />
-          <Text color="red.500" mt="2">
-            {errors.gif?.message}
-          </Text>
-
-          <Button
-            mt={4}
-            colorScheme="teal"
-            isLoading={isSubmitting}
-            type="submit"
-          >
-            Submit
-          </Button>
-        </Flex>
-      </form>
-      <SimpleGrid
-        spacing="10"
-        columns={{ base: 1, md: 2, lg: 3, xl: 4 }}
-        py="10"
-      >
-        {gifsList.map((gif, index) => (
-          <Box
-            key={index}
-            rounded="2xl"
-            overflow="hidden"
-            border="4px"
-            borderColor="red.800"
-            display="inline-flex"
-            maxH="300px"
-            maxW="300px"
-            _hover={{ border: '4px', borderColor: 'red' }}
-            sx={{
-              '.gif_player': {
-                display: 'inline-block',
-                pos: 'relative',
-                userSelect: 'none',
-                cursor: 'pointer',
-                '.play_button': {
-                  pos: 'absolute',
-                  left: '50%',
-                  top: '50%',
-                  padding: '14px 12px',
-                  bgColor: 'rgba(0, 0, 0, 0.5)',
-                  border: '2px dashed #fff',
-                  borderRadius: '50%',
-                  boxShadow: '0 0 0 3px rgba(0, 0, 0, 0.5)',
-                  color: '#FFF',
-                  fontsize: '24px',
-                  fontFamily: 'heading',
-                  opacity: '1',
-                  transform: 'translate(-50%, -50%) scale(1) rotate(0deg)',
-                  transition: 'transform 0.4s, opacity 0.4s;}',
-                },
-                '.play_button:hover': {
-                  bgColor: 'rgba(0,0,0,0.7)',
-                },
-                '.play_button::after': {
-                  content: `'GIF'`,
-                },
-                '.playing .play_button': {
-                  transform: 'translate(-50%, -50%) scale(0) rotate(180deg)',
-                  opacity: '0.5',
-                },
-                '.gif_player img': {
-                  w: '300px',
-                  h: '100%',
-                  objectFit: 'cover',
-                },
-              },
-            }}
-          >
-            <GifPlayer
-              gif={gif}
-              onTogglePlay={() => {}}
-              width="300px"
-              height="300px"
-            />
-          </Box>
-        ))}
-      </SimpleGrid>
+      <MusicPlayer />
+      <InputGif
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        isSubmitting={isSubmitting}
+        register={register}
+        errors={errors}
+      />
+      <GifsContainer gifsList={gifsList} />
     </Flex>
   )
 
@@ -273,59 +157,15 @@ export default function Home() {
         py="12"
         px="6"
       >
-        <Box mb="4">
-          <Image src={Logo} alt="Logo" />
-        </Box>
-        {!walletAddress && (
-          <Box
-            rounded="2xl"
-            m="4"
-            overflow="hidden"
-            border="4px"
-            _hover={{ border: '4px', borderColor: 'red' }}
-          >
-            <GifPlayer
-              gif="https://media.giphy.com/media/ubd3YFbbktwGUJtXey/giphy.gif"
-              onTogglePlay={() => {
-                console.log('hello')
-              }}
-              width="300px"
-              height="300px"
-            />
-          </Box>
-        )}
-        <Heading
-          as="h1"
-          color="gray.300"
-          fontSize="md"
-          mb="8"
-          fontStyle="italic"
-        >
-          Your collection of B-boyz GIFs straight from the blockchainz
-        </Heading>
+        <Header
+          logo={Logo}
+          subtitle="Your collection of B-boyz GIFs straight from the blockchainz"
+        />
         {!walletAddress && !isLoading && renderNotConnectedContainer()}
         {walletAddress && renderConnectedContainer()}
       </Flex>
 
-      <Box role="contentinfo">
-        <Flex justify="center" p="6" color="white">
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Powered by{' '}
-            <span>
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                width={72}
-                height={16}
-              />
-            </span>
-          </a>
-        </Flex>
-      </Box>
+      <Footer />
     </Box>
   )
 }
